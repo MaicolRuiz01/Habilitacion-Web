@@ -36,12 +36,7 @@ public class Habilidad implements Serializable{
 	@JoinColumn(name="rango_id")
 	private Rango rango;
 	@JsonIgnore
-	@ManyToMany
-    @JoinTable(
-        name = "habilidad_jugador",
-        joinColumns = @JoinColumn(name = "habilidad_id"),
-        inverseJoinColumns = @JoinColumn(name = "jugador_id")
-    )
+	@ManyToMany(mappedBy = "habilidades")
     private List<Jugador> jugadores;
 	
 

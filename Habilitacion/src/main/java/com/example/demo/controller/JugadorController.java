@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,9 @@ import com.example.demo.entities.Clase;
 
 import com.example.demo.entities.Habilidad;
 import com.example.demo.entities.Jugador;
+import java.util.ArrayList;
+
+
 
 import com.example.demo.repository.RepoClase;
 import com.example.demo.repository.RepoHabilidad;
@@ -104,31 +108,34 @@ public class JugadorController {
 	 }
 	
 	@PostMapping("/{nuuid}/habilidades/{nuuidHabilidad}")
-	 public ResponseEntity<String> agregarHabilidadAjugador(
-	         @PathVariable("nuuid") String jugadorNuuid,
-	         @PathVariable("nuuidHabilidad") String habilidadNuuid) {//tener nuuid dos veces genera error{
+	public ResponseEntity<String> agregarHabilidadAJugador(
+	        @PathVariable("nuuid") String jugadorNuuid,
+	        @PathVariable("nuuidHabilidad") String habilidadNuuid) {
 
-		 Jugador jugador = repojugador.findByNuuid(jugadorNuuid);
-	     Habilidad habilidad = repohabi.findByNuuid(habilidadNuuid);
+	    Jugador jugador = repojugador.findByNuuid(jugadorNuuid);
+	    Habilidad habilidad = repohabi.findByNuuid(habilidadNuuid);
 
-	     if (jugador == null || habilidad == null) {
-	         return ResponseEntity.notFound().build();
-	     }
+	    if (jugador == null || habilidad == null) {
+	        return ResponseEntity.notFound().build();
+	    }
 
-	     List<Habilidad> habilidadesJugador = jugador.getHabilidades();
+	    // Obtener o inicializar la lista de habilidades del jugador
+	    List<Habilidad> habilidadesJugador = jugador.getHabilidades();
+	    if (habilidadesJugador == null) {
+	        habilidadesJugador = new ArrayList<>();
+	    }
 
-	     // Verificar si el Pokemon ya está asociado al Entrenador
-	     boolean yaAsociado = habilidadesJugador.contains(habilidad);
+	    // Verifica si el jugador ya tiene la habilidad
+	    if (!habilidadesJugador.contains(habilidad)) {
+	        habilidadesJugador.add(habilidad);
+	        jugador.setHabilidades(habilidadesJugador); // Actualiza la lista de habilidades en el jugador
+	        repojugador.save(jugador); // Guarda los cambios en la base de datos
+	        return ResponseEntity.ok().build();
+	    }
 
-	     if (yaAsociado) {
-	         return ResponseEntity.badRequest().body("LA habilidad ya está registrada al jugador");
-	     }
+	    return ResponseEntity.badRequest().body("El jugador ya tiene esta habilidad.");
+	}
 
-	     habilidadesJugador.add(habilidad);
-	     repojugador.save(jugador);
-
-	     return ResponseEntity.ok().build();
-	 }
 	
 	 @PutMapping("/{nuuid}")
 	    public ResponseEntity<Jugador> actualizarJugador(@PathVariable("nuuid") String nuuid, @RequestBody Jugador jugadorActualizado) {

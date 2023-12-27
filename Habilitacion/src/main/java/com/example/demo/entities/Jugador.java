@@ -40,9 +40,18 @@ public class Jugador implements Serializable{
 	@JoinColumn(name="rango_id")
 	private Rango rango;
 	@JsonIgnore
-	@ManyToMany(mappedBy = "jugadores")
+	@ManyToMany
+	@JoinTable(
+	        name = "habilidad_jugador",
+	        joinColumns = @JoinColumn(name = "jugador_id"),
+	        inverseJoinColumns = @JoinColumn(name = "habilidad_id")
+	    )
     private List<Habilidad> habilidades;
 	private String nuuid;
+	
+	public void addHabilidad(Habilidad habilidad) {
+		this.habilidades.add(habilidad);
+	}
 	
 
 }
